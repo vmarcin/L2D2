@@ -88,6 +88,13 @@ OPTIONS
            Show this manual with all internal options in the INTERNAL OPTIONS
            section
 
+       --locking_error
+           Activates: enable heurestic which cuts of lock-error paths (paths
+           on which double locking or release before previous acquisition
+           occurs) and suppress a warnings of this type. This heuristic is
+           used to reduce the number of false positives. WARNING: It can
+           cause false negatives! (Conversely: --no-locking_error)
+
        --log-events
            Activates: Turn on the feature that logs events in a
            machine-readable format (Conversely: --no-log-events)

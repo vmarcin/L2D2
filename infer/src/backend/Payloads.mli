@@ -27,6 +27,7 @@ include sig
     ; racerd: RacerDDomain.summary option
     ; siof: SiofDomain.Summary.t option
     ; starvation: StarvationDomain.summary option
+    ; deadlock: DeadlockDomain.summary option
     ; typestate: TypeState.t option
     ; uninit: UninitDomain.Summary.t option }
   [@@deriving fields]

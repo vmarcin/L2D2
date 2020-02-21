@@ -432,6 +432,13 @@ let stack_variable_address_escape =
 
 let starvation = register_from_string "STARVATION" ~hum:"UI Thread Starvation"
 
+let double_locking = register_from_string "DOUBLE_LOCKING"
+
+let double_unlocking = register_from_string "DOUBLE_UNLOCKING"
+
+let release_without_acquisition = register_from_string "RELEASE_WITHOUT_ACQUISITION"
+
+
 let static_initialization_order_fiasco = register_from_string "STATIC_INITIALIZATION_ORDER_FIASCO"
 
 let strict_mode_violation =

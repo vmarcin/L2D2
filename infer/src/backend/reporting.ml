@@ -12,6 +12,7 @@ type log_t = ?ltr:Errlog.loc_trace -> ?extras:Jsonbug_t.extra -> IssueType.t -> 
 
 let log_issue_from_errlog procname ~clang_method_kind severity err_log ~loc ~node ~session ~ltr
     ~access ~extras exn =
+  Format.printf "reporting \t %a\n" Procname.pp procname;
   let issue_type = (Exceptions.recognize_exception exn).name in
   if (not Config.filtering) (* no-filtering takes priority *) || issue_type.IssueType.enabled then
     let doc_url = issue_type.doc_url in

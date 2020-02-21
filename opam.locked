@@ -124,6 +124,7 @@ depends: [
   "sexplib0" {= "v0.12.0"}
   "spawn" {= "v0.13.0"}
   "splittable_random" {= "v0.12.0"}
+  "utop" {with-test}
   "sqlite3" {= "5.0.1"}
   "stdio" {= "v0.12.0"}
   "stdlib-shims" {= "0.1.0"}

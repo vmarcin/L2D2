@@ -1167,7 +1167,7 @@ let pp_summary_and_issues formats_by_report_kind issue_formats =
   if Config.precondition_stats then PreconditionStats.pp_stats () ;
   if Config.summary_stats then SummaryStats.pp_stats () ;
   List.iter
-    [Config.lint_issues_dir_name; Config.starvation_issues_dir_name; Config.racerd_issues_dir_name]
+    [Config.lint_issues_dir_name; Config.starvation_issues_dir_name; Config.racerd_issues_dir_name; Config.deadlock_issues_dir_name]
     ~f:(fun dir_name ->
       IssueLog.load dir_name
       |> IssueLog.iter ~f:(pp_lint_issues filters formats_by_report_kind linereader) ) ;

@@ -175,6 +175,8 @@ val specs_files_suffix : string
 
 val starvation_issues_dir_name : string
 
+val deadlock_issues_dir_name : string
+
 val test_determinator_results : string
 
 val trace_absarray : bool
@@ -457,6 +459,8 @@ val litho_required_props : bool
 
 val liveness : bool
 
+val locking_error : bool
+
 val liveness_dangerous_classes : Yojson.Basic.t
 
 val log_events : bool
@@ -665,6 +669,8 @@ val sqlite_vfs : string option
 val sqlite_write_daemon : bool
 
 val starvation : bool
+
+val deadlock : bool
 
 val starvation_skip_analysis : Yojson.Basic.t
 

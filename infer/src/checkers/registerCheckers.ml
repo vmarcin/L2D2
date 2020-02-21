@@ -134,6 +134,12 @@ let all_checkers =
         ; (Cluster Starvation.reporting, Language.Java)
         ; (Procedure Starvation.analyze_procedure, Language.Clang)
         ; (Cluster Starvation.reporting, Language.Clang) ] }
+  ; { name= "Deadlock analysis"
+    ; active= Config.deadlock
+    ; callbacks =
+        [ (Procedure Deadlock.checker, Language.Clang)
+        ; (Cluster Deadlock.reporting, Language.Clang)]
+    }  
   ; { name= "purity"
     ; active= Config.purity || Config.loop_hoisting
     ; callbacks=

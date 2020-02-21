@@ -278,6 +278,15 @@ OPTIONS
            Specify scope guard classes that can be read only by destructors
            without being reported as dead stores.           See also infer-analyze(1).
 
+       --no-deadlock
+           Deactivates: Deadlock analysis. You can also use the second mode
+           of deadlock analyser (See --locking_error). (Conversely:
+           --deadlock)           See also infer-analyze(1).
+
+       --deadlock-only
+           Activates: Enable --deadlock and disable all other checkers
+           (Conversely: --no-deadlock-only)           See also infer-analyze(1).
+
        --debug,-g
            Activates: Debug mode (also sets --debug-level 2,
            --developer-mode, --print-buckets, --print-types,
@@ -323,8 +332,9 @@ OPTIONS
        --no-default-checkers
            Deactivates: Default checkers: --biabduction,
            --fragment-retains-view, --inefficient-keyset-iterator, --linters,
-           --liveness, --racerd, --siof, --starvation, --self_in_block,
-           --uninit (Conversely: --default-checkers)           See also infer-analyze(1).
+           --liveness, --racerd, --siof, --starvation, --deadlock,
+           --self_in_block, --uninit (Conversely: --default-checkers)       
+    See also infer-analyze(1).
 
        --no-default-linters
            Deactivates: Use the default linters for the analysis.
@@ -397,6 +407,8 @@ OPTIONS
              DEALLOCATE_STATIC_MEMORY (enabled by default),
              DEALLOCATION_MISMATCH (enabled by default),
              DIVIDE_BY_ZERO (disabled by default),
+             DOUBLE_LOCKING (enabled by default),
+             DOUBLE_UNLOCKING (enabled by default),
              DO_NOT_REPORT (enabled by default),
              EMPTY_VECTOR_ACCESS (enabled by default),
              ERADICATE_CONDITION_REDUNDANT (enabled by default),
@@ -473,6 +485,7 @@ OPTIONS
              PURE_FUNCTION (enabled by default),
              QUANDARY_TAINT_ERROR (enabled by default),
              REGISTERED_OBSERVER_BEING_DEALLOCATED (enabled by default),
+             RELEASE_WITHOUT_ACQUISITION (enabled by default),
              RESOURCE_LEAK (enabled by default),
              RETAIN_CYCLE (enabled by default),
              RETURN_EXPRESSION_REQUIRED (enabled by default),
@@ -758,6 +771,14 @@ OPTIONS
        --load-average,-l float
            Do not start new parallel jobs if the load average is greater than
            that specified (Buck and make only)           See also infer-capture(1).
+
+       --locking_error
+           Activates: enable heurestic which cuts of lock-error paths (paths
+           on which double locking or release before previous acquisition
+           occurs) and suppress a warnings of this type. This heuristic is
+           used to reduce the number of false positives. WARNING: It can
+           cause false negatives! (Conversely: --no-locking_error)       
+    See also infer-run(1).
 
        --log-events
            Activates: Turn on the feature that logs events in a

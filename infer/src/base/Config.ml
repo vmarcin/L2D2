@@ -43,6 +43,7 @@ type checkers =
   ; resource_leak: bool ref
   ; siof: bool ref
   ; starvation: bool ref
+  ; deadlock: bool ref
   ; uninit: bool ref }
 
 let equal_analyzer = [%compare.equal: analyzer]
@@ -283,6 +284,8 @@ let specs_dir_name = "specs"
 let specs_files_suffix = ".specs"
 
 let starvation_issues_dir_name = "starvation_issues"
+
+let deadlock_issues_dir_name = "deadlock_issues"
 
 let test_determinator_results = "test_determinator_results"
 
@@ -643,6 +646,7 @@ and { annotation_reachability
     ; resource_leak
     ; siof
     ; starvation
+    ; deadlock
     ; uninit } =
   let mk_checker ?(default = false) ?(deprecated = []) ~long doc =
     let var =
@@ -706,6 +710,8 @@ and { annotation_reachability
     mk_checker ~long:"siof" ~default:true
       "the Static Initialization Order Fiasco analysis (C++ only)"
   and starvation = mk_checker ~long:"starvation" ~default:true "starvation analysis"
+  and deadlock = mk_checker ~long:"deadlock" ~default:true "Deadlock analysis. You can also use \
+  the second mode of deadlock analyser (See $(b,--locking_error))."
   and self_in_block =
     mk_checker ~long:"self_in_block" ~default:true
       "checker to flag incorrect uses of when Objective-C blocks capture self"
@@ -770,6 +776,7 @@ and { annotation_reachability
   ; self_in_block
   ; siof
   ; starvation
+  ; deadlock
   ; uninit }
 
 
@@ -1611,6 +1618,12 @@ and join_cond =
 - 1 = use the least aggressive join for preconditions
 |}
 
+and locking_error = CLOpt.mk_bool ~long:"locking_error" ~default:false 
+~in_help:InferCommand.[(Run, manual_generic)]   
+"enable heurestic which cuts of lock-error paths \
+(paths on which double locking or release before previous acquisition occurs) \
+ and suppress a warnings of this type. This heuristic is used to reduce the \
+ number of false positives. WARNING: It can cause false negatives!"
 
 and liveness_dangerous_classes =
   CLOpt.mk_json ~long:"liveness-dangerous-classes"
@@ -2975,6 +2988,7 @@ and liveness_dangerous_classes = !liveness_dangerous_classes
 and load_average =
   match !load_average with None when !buck -> Some (float_of_int ncpu) | _ -> !load_average
 
+  and locking_error = !locking_error  
 
 and log_events = !log_events
 
@@ -3213,6 +3227,8 @@ and sqlite_vfs = !sqlite_vfs
 and sqlite_write_daemon = !sqlite_write_daemon
 
 and starvation = !starvation
+
+and deadlock = !deadlock
 
 and starvation_skip_analysis = !starvation_skip_analysis
 

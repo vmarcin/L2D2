@@ -71,6 +71,15 @@ OPTIONS
        --custom-symbols json
            Specify named lists of symbols available to rules
 
+       --no-deadlock
+           Deactivates: Deadlock analysis. You can also use the second mode
+           of deadlock analyser (See --locking_error). (Conversely:
+           --deadlock)
+
+       --deadlock-only
+           Activates: Enable --deadlock and disable all other checkers
+           (Conversely: --no-deadlock-only)
+
        --debug,-g
            Activates: Debug mode (also sets --debug-level 2,
            --developer-mode, --print-buckets, --print-types,
@@ -103,8 +112,8 @@ OPTIONS
        --no-default-checkers
            Deactivates: Default checkers: --biabduction,
            --fragment-retains-view, --inefficient-keyset-iterator, --linters,
-           --liveness, --racerd, --siof, --starvation, --self_in_block,
-           --uninit (Conversely: --default-checkers)
+           --liveness, --racerd, --siof, --starvation, --deadlock,
+           --self_in_block, --uninit (Conversely: --default-checkers)
 
        --eradicate
            Activates: the eradicate @Nullable checker for Java annotations

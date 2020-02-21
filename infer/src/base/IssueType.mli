@@ -296,6 +296,12 @@ val stack_variable_address_escape : t
 
 val starvation : t
 
+val double_locking : t
+
+val double_unlocking : t
+
+val release_without_acquisition : t
+
 val static_initialization_order_fiasco : t
 
 val strict_mode_violation : t
