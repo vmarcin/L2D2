@@ -111,8 +111,7 @@ let checker {Callbacks.exe_env; summary} =
  * Deadlocks reporting by first finding an oposite dependencies and
  * then checking for guard locks
  *)
-let report_deadlocks dependencies source_file =
-  (* F.printf "before edges: %a\n" Domain.Edges.pp dependencies; *)
+let report_deadlocks dependencies =
   let should_report (edge: Domain.Edge.t) (edge': Domain.Edge.t) deps =
     let (lock1,lock2) = edge.edge in 
     let pname1 = edge.pname in 
@@ -147,8 +146,8 @@ let report_deadlocks dependencies source_file =
     ) dependencies [] 
   in
 
-  List.iter ~f:(fun ((dep: Domain.Edge.t),rev) -> 
-    Domain.Edges.iter (fun e ->  
+  List.fold potential_deadlocks ~init:IssueLog.empty ~f:(fun issue_log ((dep: Domain.Edge.t), rev) -> 
+    Domain.Edges.fold (fun e log_report ->
       if (should_report dep e dependencies) then (
         (* F.printf "DEADLOCK %a  %a\n" Domain.Edge.pp dep Domain.Edge.pp e; *)
         let message = F.asprintf "Deadlock between:\t%a\n\t\t\t%a\n"
@@ -159,13 +158,9 @@ let report_deadlocks dependencies source_file =
         let ltr : Errlog.loc_trace_elem list =
           [Errlog.make_trace_element 0 (snd(fst(dep.edge))) "" [Errlog.Procedure_start dep.pname]]
         in
-        let issue : IssueLog.t =
-          Reporting.log_issue_external ~issue_log:IssueLog.empty dep.pname Exceptions.Error ~loc ~ltr IssueType.deadlock message
-        in
-        IssueLog.store ~dir:Config.deadlock_issues_dir_name ~file:source_file issue
-      ) else ()  
-    ) rev
-  ) potential_deadlocks
+        Reporting.log_issue_external ~issue_log:log_report dep.pname Exceptions.Error ~loc ~ltr IssueType.deadlock message
+      ) else log_report
+    ) rev issue_log )
    
 let reporting {Callbacks.procedures; source_file} =
   (* Getting all lock dependencies in the analysed program. *)
@@ -176,4 +171,5 @@ let reporting {Callbacks.procedures; source_file} =
             | None -> acc
     ) ~init:Domain.Edges.empty procedures
   in  
-  report_deadlocks locks_dependencies source_file 
+  report_deadlocks locks_dependencies
+  |> IssueLog.store ~dir: Config.deadlock_issues_dir_name ~file:source_file
