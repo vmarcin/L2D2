@@ -480,6 +480,8 @@ val method_decls_info : string option
 val ml_buckets :
   [`MLeak_all | `MLeak_arc | `MLeak_cf | `MLeak_cpp | `MLeak_no_arc | `MLeak_unknown] list
 
+val models_json : string option
+
 val modified_lines : string option
 
 val monitor_prop_size : bool

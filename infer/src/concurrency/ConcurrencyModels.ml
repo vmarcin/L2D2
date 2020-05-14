@@ -7,6 +7,7 @@
 
 open! IStd
 module L = Logging
+module YBU = Yojson.Basic.Util
 
 type lock_effect =
   | Lock of HilExp.t list
@@ -64,6 +65,38 @@ end = struct
     ; unlock: string list
     ; recursive: bool }
 
+  let user_models = 
+    let json =
+      (match Config.models_json with
+      | Some file -> (
+        match Utils.read_json_file file with
+        | Ok json ->
+          json
+        | Error msg ->
+          CommandLineOption.warnf "WARNING: Could not read or parse Infer config in %s:@\n%s@." file msg ;
+          `List [`Assoc []]
+        )
+      | None -> `List [`Assoc []]) |> YBU.to_list
+    in
+    
+    let yojson_lookup yojson elt_name ret_conv default =
+      match List.Assoc.find ~equal:String.equal (YBU.to_assoc yojson) elt_name with
+      | Some lock_model -> ret_conv lock_model
+      | None -> default
+    in
+
+    let classnames = List.map json ~f:(fun json -> yojson_lookup json "classname" YBU.to_string "") in
+    let locks = List.map json ~f:(fun json -> yojson_lookup json "lock" YBU.to_string "") in
+    let trylocks = List.map json ~f:(fun json -> yojson_lookup json "trylock" YBU.to_string "") in
+    let unlocks = List.map json ~f:(fun json -> yojson_lookup json "unlock" YBU.to_string "") in
+    let recs = List.map json ~f:(fun json -> yojson_lookup json "recursive" YBU.to_bool false) in
+    
+    let zip2rec (r, (u, (t, (c, l)))) =
+      { classname= c; lock=[l]; trylock=[t]; unlock=[u]; recursive=r }
+    in
+    List.zip_exn classnames locks |> List.zip_exn trylocks |> List.zip_exn unlocks |> List.zip_exn recs
+    |> List.map ~f:zip2rec
+
   let lock_models =
     let def =
       {classname= ""; lock= ["lock"]; trylock= ["try_lock"]; unlock= ["unlock"]; recursive= false}
@@ -87,7 +120,7 @@ end = struct
       ; trylock= ["pthread_mutex_trylock"]
       ; unlock= ["pthread_mutex_unlock"] }
     in
-
+    List.append
     [ { def with
         classname= "apache::thrift::concurrency::Monitor"
       ; trylock= "timedlock" :: def.trylock }
@@ -106,7 +139,7 @@ end = struct
     ; {def with classname= "std::recursive_timed_mutex"; recursive= true}
     ; {shd with classname= "std::shared_mutex"}
     ; {def with classname= "std::timed_mutex"} 
-    ; {pth with classname= ""} ] (* added *)
+    ; {pth with classname= ""} ] user_models (* added *)
 
 
   let is_recursive_lock_type qname =

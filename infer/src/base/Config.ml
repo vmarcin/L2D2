@@ -1745,6 +1745,9 @@ and ml_buckets =
 |}
     ~symbols:ml_bucket_symbols ~eq:PolyVariantEqual.( = )
 
+and models_json =
+  CLOpt.mk_path_opt ~long:"c-lock-models" ~in_help:InferCommand.[(Run, manual_generic)] ~meta:"file.json"
+  "Specifies the file containing C/C++ lock models, which will be used during the deadlock analysis."
 
 and modified_lines =
   CLOpt.mk_path_opt ~long:"modified-lines"
@@ -2988,7 +2991,7 @@ and liveness_dangerous_classes = !liveness_dangerous_classes
 and load_average =
   match !load_average with None when !buck -> Some (float_of_int ncpu) | _ -> !load_average
 
-  and locking_error = !locking_error  
+and locking_error = !locking_error  
 
 and log_events = !log_events
 
@@ -3007,6 +3010,8 @@ and method_decls_info = !method_decls_info
 and merge = !merge
 
 and ml_buckets = !ml_buckets
+
+and models_json = !models_json
 
 and modified_lines = !modified_lines
 
