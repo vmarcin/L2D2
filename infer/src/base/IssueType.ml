@@ -432,7 +432,7 @@ let stack_variable_address_escape =
 
 let starvation = register_from_string "STARVATION" ~hum:"UI Thread Starvation"
 
-let double_locking = register_from_string "DOUBLE_LOCKING"
+let self_deadlock = register_from_string "SELF DEADLOCK"
 
 let double_unlocking = register_from_string "DOUBLE_UNLOCKING"
 

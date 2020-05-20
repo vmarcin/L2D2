@@ -184,6 +184,10 @@ OPTIONS
            Activates: Enable --bufferoverrun and disable all other checkers
            (Conversely: --no-bufferoverrun-only)           See also infer-analyze(1).
 
+       --c-lock-models file.json
+           Specifies the file containing C/C++ lock models, which will be
+           used during the deadlock analysis.           See also infer-run(1).
+
        --capture-blacklist regex
            Skip capture of files matched by the specified OCaml regular
            expression (only supported by the javac integration for now).       

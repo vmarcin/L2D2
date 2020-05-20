@@ -36,9 +36,8 @@ module TransferFunctions (CFG : ProcCfg.S) = struct
     | Call (_, Direct callee_pname, actuals, _, loc) ->(
       match get_lock_effect callee_pname actuals with
       | Lock locks ->
-          (* F.printf "lock at line %a\n" Location.pp loc; *)
           get_path locks 
-          |> Option.value_map ~default:astate ~f:(fun path -> Domain.acquire path astate loc extras pname)
+          |> Option.value_map ~default:astate ~f:(fun path -> Domain.acquire path astate loc extras pname callee_pname)
       | Unlock locks ->
           get_path locks
           |> Option.value_map ~default:astate ~f:(fun path -> Domain.release path astate loc extras pname)

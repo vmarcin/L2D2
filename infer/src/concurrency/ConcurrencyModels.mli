@@ -63,3 +63,7 @@ val runs_on_ui_thread :
 
 val is_modeled_ui_method : Tenv.t -> Procname.t -> bool
 (** is method a known Android UI thread callback (eg [Activity.onCreate]) *)
+
+module Clang : sig
+  val is_recursive_lock_without_class : string -> bool
+end

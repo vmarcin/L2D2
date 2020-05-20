@@ -16,6 +16,10 @@ DESCRIPTION
 
 
 OPTIONS
+       --c-lock-models file.json
+           Specifies the file containing C/C++ lock models, which will be
+           used during the deadlock analysis.
+
        --censor-report +string
            Specify a filter for issues to be censored by adding a
            'censored_reason' field in the json report. Infer will not report

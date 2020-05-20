@@ -296,7 +296,7 @@ val stack_variable_address_escape : t
 
 val starvation : t
 
-val double_locking : t
+val self_deadlock : t
 
 val double_unlocking : t
 

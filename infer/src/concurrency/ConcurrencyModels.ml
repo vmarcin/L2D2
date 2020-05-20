@@ -57,6 +57,8 @@ module Clang : sig
   val get_lock_effect : Procname.t -> HilExp.t list -> lock_effect
 
   val is_recursive_lock_type : QualifiedCppName.t -> bool
+
+  val is_recursive_lock_without_class : string -> bool
 end = struct
   type lock_model =
     { classname: string
@@ -152,6 +154,13 @@ end = struct
     | Some mdl ->
         mdl.recursive
 
+  let is_recursive_lock_without_class pname =
+    List.filter lock_models ~f:(fun mdl -> String.equal "" mdl.classname) 
+    |> List.fold ~init:false ~f:(fun is_rec mdl_without_class -> 
+      match List.find mdl_without_class.lock ~f:(fun lock_mdl -> String.equal pname lock_mdl) with
+      | Some _ -> is_rec || mdl_without_class.recursive
+      | None -> is_rec || false
+    )
 
   let mk_matcher methods =
     let matcher = QualifiedCppName.Match.of_fuzzy_qual_names methods in

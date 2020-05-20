@@ -154,7 +154,7 @@ let is_local : LockEvent.t -> bool =
 let is_formal ((base,_), _) extras =
   FormalMap.is_formal base extras 
   
-let acquire lockid astate loc extras pname =
+let acquire lockid astate loc extras pname lock_name =
   let lock : LockEvent.t = (lockid, loc) in
   
   (* Compare each element of a set with the currently released lock. *)    
@@ -165,6 +165,15 @@ let acquire lockid astate loc extras pname =
     Edges.add {edge = (elem, lock); pname = pname} acc
   in
 
+  let is_recursive_lock =
+    match Procname.get_class_type_name lock_name with
+    | Some qname ->
+        ConcurrencyModels.is_recursive_lock_type qname
+    | None ->
+        Procname.get_method lock_name
+        |> ConcurrencyModels.Clang.is_recursive_lock_without_class
+  in
+  
   let new_astate : t =
     let locked = astate.locked in
     let unlocked = 
@@ -183,7 +192,7 @@ let acquire lockid astate loc extras pname =
           astate.unlocked
     in
     let lockset =
-      if ((Lockset.exists cmp astate.lockset)) then begin 
+      if ((Lockset.exists cmp astate.lockset) && not(is_recursive_lock)) then begin 
         if Config.locking_error then
           (** Double locking and heuritics turned on (Config.locking_error=True). 
             *  We assume that our analyser used a non-existent path to reach the lock statement
@@ -196,7 +205,7 @@ let acquire lockid astate loc extras pname =
           (** Double locking and heuritics turned off (Config.locking_error=False). 
           *  We assume that program is in inconsistent state, so warning is reported.
           *)
-          reportMap := ReportSet.add ([lock], loc, pname, "Double locking", IssueType.double_locking) !reportMap;
+          reportMap := ReportSet.add ([lock], loc, pname, "Self-deadlock", IssueType.self_deadlock) !reportMap;
           Lockset.add lock astate.lockset
         end
       end
@@ -360,7 +369,7 @@ let integrate_summary astate callee_pname loc callee_summary callee_formals actu
     not(Config.locking_error)) then begin
     (* Double locking *)
     let erroneously_locks = Lockset.elements (Lockset.inter summary_unlocked astate.lockset) in
-    reportMap := ReportSet.add (erroneously_locks, loc, callee_pname, "Double locking", IssueType.double_locking) !reportMap;
+    reportMap := ReportSet.add (erroneously_locks, loc, callee_pname, "Self-deadlock", IssueType.self_deadlock) !reportMap;
   end;
   if (not(Lockset.is_empty (Lockset.inter astate.unlockset summary_locked)) &&
     not(Config.locking_error)) then begin
